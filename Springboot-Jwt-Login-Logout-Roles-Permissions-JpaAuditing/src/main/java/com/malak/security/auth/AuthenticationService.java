@@ -6,6 +6,7 @@ import com.malak.security.tfa.TwoFactorAuthenticationService;
 import com.malak.security.token.Token;
 import com.malak.security.token.TokenRepository;
 import com.malak.security.token.TokenType;
+import com.malak.security.user.Role;
 import com.malak.security.user.User;
 import com.malak.security.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -41,7 +42,7 @@ public class AuthenticationService {
                 .lastname(request.getLastname())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword())) //encode password ,inject password encoder
-                .role(request.getRole()) //startic role
+                .role(Role.ADMIN) //static role
                 .mfaEnabled(request.isMfaEnabled())
                 .build();
         // if MFA enabled --> Generate Secret

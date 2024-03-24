@@ -1,4 +1,4 @@
-package com.malak.security;
+  package com.malak.security;
 
 import com.malak.security.auth.AuthenticationService;
 import com.malak.security.auth.RegisterRequest;

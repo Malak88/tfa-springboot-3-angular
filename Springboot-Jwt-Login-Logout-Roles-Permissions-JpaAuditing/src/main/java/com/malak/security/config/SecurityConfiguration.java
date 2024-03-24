@@ -3,14 +3,11 @@ package com.malak.security.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -44,6 +41,7 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter; // final to be automatically injected by spring
     private final AuthenticationProvider authenticationProvider; // need to be implemented in appConfig class
     private final LogoutHandler logoutHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -53,6 +51,7 @@ public class SecurityConfiguration {
         // white list = endpoints dont requires any token /auth ==> open e.g login, create account ..
         // 1 implemnt white list
         http
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(null))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         authReq -> authReq

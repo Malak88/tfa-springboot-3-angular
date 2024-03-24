@@ -4,6 +4,10 @@ package com.malak.security.config;
 import com.malak.security.auditing.ApplicationAuditAware;
 import com.malak.security.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -15,6 +19,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.ORIGIN;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 
 // will hold all app config such as bean ..
 @Configuration //at app start app spring will pick up this class and inject all beans delarated here
@@ -28,7 +45,6 @@ public class ApplicationConfig {
     //from jwtAuthFilter
     @Bean // bean is always public
     public UserDetailsService userDetailsService() {
-
         //lambda expression
         return username -> userRepository.findByEmail(username) //return optional we need to add orElse if not founded !!
                 .orElseThrow(() -> new UsernameNotFoundException("User not found")); //exception
@@ -55,8 +71,6 @@ public class ApplicationConfig {
         return new ApplicationAuditAware();
     }
 
-
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -72,4 +86,28 @@ public class ApplicationConfig {
 
     //end
     // provide endpoints == controller
+
+    //CORS pronlem Solution
+    @Bean
+    public CorsFilter corsFilter() {
+      final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+      final CorsConfiguration config = new CorsConfiguration();
+      config.setAllowCredentials(true);
+      config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+      config.setAllowedHeaders(Arrays.asList(
+              ORIGIN,
+              CONTENT_TYPE,
+              ACCEPT,
+              AUTHORIZATION
+      ));
+      config.setAllowedMethods(Arrays.asList(
+              GET.name(),
+              POST.name(),
+              DELETE.name(),
+              PUT.name(),
+              PATCH.name()
+      ));
+      source.registerCorsConfiguration("/**", config);
+      return new CorsFilter(source);
+    }
 }
